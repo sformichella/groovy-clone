@@ -1,0 +1,12 @@
+{
+  "name": "groovy-clone",
+  "version": "0.1",
+  "description": "groovy clone",
+  "main": "index.js",
+  "repository": "https://github.com/sformichella/groovy-clone.git",
+  "author": "sformichella <sformichella@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "discord.io": "^2.5.3"
+  }
+}
