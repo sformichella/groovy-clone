@@ -7,6 +7,6 @@
   "author": "sformichella <sformichella@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "discord.io": "^2.5.3"
+    "discord.js": "^13.3.1"
   }
 }

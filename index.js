@@ -1,11 +1,21 @@
-const discord = require('discord.io')
-const auth = require('auth.json')
+const { Client, Intents } = require('discord.js')
+const { token } = require('./auth.json')
 
-const bot = discord.Client({
-  token: auth.token,
-  autorun: true,
+const client = new Client({
+  intents: [
+    Intents.FLAGS.GUILDS,
+  ]
 })
 
-bot.on('ready', function() {
-  console.log('hi');
-})
+client.login(token)
+// client.destroy(token)
+
+// When the client is ready, run this code (only once)
+const codingNerdStuff = 'coding-nerd-stuff'
+
+client.once('ready', () => {
+	console.log('Ready!');
+  client.channels.cache
+    .find(channel => channel.name === codingNerdStuff)
+    .send('Wasssssup')
+});
