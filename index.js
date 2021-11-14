@@ -10,12 +10,12 @@ const {
 
 const ytdl = require("ytdl-core");
 
+const library = require('./library')
+
 client.on('interactionCreate', async (interaction) => {
   if(!interaction.isCommand()) return
 
   const { commandName } = interaction
-
-  console.log('INTERACTION', interaction);
 
   if(commandName === 'play') {
     const channel = client
@@ -24,13 +24,16 @@ client.on('interactionCreate', async (interaction) => {
       .voice.channel
 
     const connection = createConnection(channel)
-    const rocketLawnChair = createResourceFromLink('https://www.youtube.com/watch?v=7ljtZJ9g5zo')
+
+    const { link, execute } = getCommand(interaction)
+
+    const resource = createResourceFromLink(link)
 
     const player = createAudioPlayer()
     connection.subscribe(player)
-    player.play(rocketLawnChair)
+    player.play(resource)
 
-    await interaction.reply(`Playing rocket lawnchair >:-)`)
+    await execute(interaction)
 
     player.on('stateChange', (old, current) => {
       if(current.status === 'idle') {
@@ -58,6 +61,13 @@ function createConnection(channel) {
     guildId: channel.guild.id,
     adapterCreator: channel.guild.voiceAdapterCreator,
   })
+}
+
+function getCommand(interaction) {
+  const sub = interaction.options.getSubcommand()
+  const isFromLibrary = Object.keys(library).find(l => l === sub)
+
+  if(isFromLibrary) return library[isFromLibrary]
 }
 
 // function parseLink(link) {
