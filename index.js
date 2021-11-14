@@ -25,7 +25,7 @@ client.on('interactionCreate', async (interaction) => {
 
     const connection = createConnection(channel)
 
-    const { link, execute } = getCommand(interaction)
+    const { link, reply } = getConfig(interaction)
 
     const resource = createResourceFromLink(link)
 
@@ -33,7 +33,7 @@ client.on('interactionCreate', async (interaction) => {
     connection.subscribe(player)
     player.play(resource)
 
-    await execute(interaction)
+    await interaction.reply(reply)
 
     player.on('stateChange', (old, current) => {
       if(current.status === 'idle') {
@@ -63,11 +63,11 @@ function createConnection(channel) {
   })
 }
 
-function getCommand(interaction) {
+function getConfig(interaction) {
   const sub = interaction.options.getSubcommand()
-  const isFromLibrary = Object.keys(library).find(l => l === sub)
+  const isFromLibrary = library.find(l => l.name === sub)
 
-  if(isFromLibrary) return library[isFromLibrary]
+  if(isFromLibrary) return isFromLibrary
 }
 
 // function parseLink(link) {

@@ -13,11 +13,11 @@ const getCommands = () => {
 		.filter(file => file.endsWith('.js'));
 
 	return commandFiles.reduce((commands, file) => {
-		const command = require(`./commands/${file}`)
+		const data = require(`./commands/${file}`)
 			.data
 			.toJSON()
 
-		return [...commands, command]
+		return [...commands, data]
 	}, [])
 }
 
