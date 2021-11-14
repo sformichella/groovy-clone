@@ -21,5 +21,8 @@
   "scripts": {
     "deploy-commands": "node deployCommands.js",
     "run": "node index.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.2.0"
   }
 }

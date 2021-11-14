@@ -9,8 +9,11 @@ const data = new SlashCommandBuilder()
       .setDescription('Play rocket launcher clip from Metal Slug')
   })
 
-const execute = interation => {
-
+const execute = async (interaction) => {
+  interaction.reply('Playing rocket lawnchair >:-)')
 }
 
-module.exports = { data }
+module.exports = { 
+  data,
+  execute
+}

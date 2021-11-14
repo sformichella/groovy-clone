@@ -1,5 +1,5 @@
-const { Client, Intents } = require('discord.js')
-const { token, gamingGoonery } = require('./config.json')
+const client = require('./client')
+const { gamingGoonery } =  require('./config.json')
 
 const { 
   joinVoiceChannel,
@@ -10,21 +10,12 @@ const {
 
 const ytdl = require("ytdl-core");
 
-const client = new Client({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_VOICE_STATES
-  ]
-})
-
-client.login(token)
-
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction) => {
   if(!interaction.isCommand()) return
 
-  const { 
-    commandName,
-  } = interaction
+  const { commandName } = interaction
+
+  console.log('INTERACTION', interaction);
 
   if(commandName === 'play') {
     const channel = client
@@ -32,33 +23,43 @@ client.on('interactionCreate', async interaction => {
       .members.cache.get(interaction.user.id)
       .voice.channel
 
-    const connection = joinVoiceChannel({
-      channelId: channel.id,
-      guildId: channel.guild.id,
-      adapterCreator: channel.guild.voiceAdapterCreator,
-    })
+    const connection = createConnection(channel)
+    const rocketLawnChair = createResourceFromLink('https://www.youtube.com/watch?v=7ljtZJ9g5zo')
 
     const player = createAudioPlayer()
-
-    const rocketLawnChair = 'https://www.youtube.com/watch?v=7ljtZJ9g5zo'
-
-    const stream = ytdl(rocketLawnChair, {
-      filter: "audioonly",
-      highWaterMark: 1 << 25,
-    });
-
-    const resource = createAudioResource(stream, {
-      inputType: StreamType.Arbitrary,
-    });
-
     connection.subscribe(player)
+    player.play(rocketLawnChair)
 
-    player.play(resource)
+    await interaction.reply(`Playing rocket lawnchair >:-)`)
 
     player.on('stateChange', (old, current) => {
       if(current.status === 'idle') {
         connection.destroy()
+        player.stop()
       }
     })
   }
 })
+
+function createResourceFromLink(link) {
+  const stream = ytdl(link, {
+    filter: "audioonly",
+    highWaterMark: 1 << 25,
+  });
+
+  return createAudioResource(stream, {
+    inputType: StreamType.Arbitrary,
+  });
+}
+
+function createConnection(channel) {
+  return joinVoiceChannel({
+    channelId: channel.id,
+    guildId: channel.guild.id,
+    adapterCreator: channel.guild.voiceAdapterCreator,
+  })
+}
+
+// function parseLink(link) {
+
+// }
