@@ -1,4 +1,5 @@
 const { createAudioPlayer } = require('@discordjs/voice')
+
 const client = require('../client')
 const { commandSymbol, gamingGoonery } = require('../config.json')
 const { parseArgs, createConnection, createResourceFromLink } = require('../utils')
@@ -43,8 +44,6 @@ function useMessageCommands(message) {
   }
 
   if(command === 'stop') {
-    // Find player??
-
 
   }
 }
