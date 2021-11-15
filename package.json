@@ -19,7 +19,8 @@
   },
   "scripts": {
     "deploy-commands": "node deployCommands.js",
-    "run": "node index.js"
+    "run": "node index.js",
+    "force-logout": "node logout.js"
   },
   "devDependencies": {
     "eslint": "^8.2.0"
