@@ -25,11 +25,12 @@ client.on('interactionCreate', async (interaction) => {
 
     const connection = createConnection(channel)
 
-    const { link, reply } = getConfig(interaction)
+    const { link, reply = 'Playing!' } = getConfig(interaction)
 
     const resource = createResourceFromLink(link)
 
     const player = createAudioPlayer()
+    
     connection.subscribe(player)
     player.play(resource)
 
@@ -37,22 +38,26 @@ client.on('interactionCreate', async (interaction) => {
 
     player.on('stateChange', (old, current) => {
       if(current.status === 'idle') {
-        connection.destroy()
         player.stop()
+        connection.destroy()
       }
     })
   }
 })
 
 function createResourceFromLink(link) {
-  const stream = ytdl(link, {
-    filter: "audioonly",
-    highWaterMark: 1 << 25,
-  });
-
-  return createAudioResource(stream, {
-    inputType: StreamType.Arbitrary,
-  });
+  try {
+    const stream = ytdl(link, {
+      filter: "audioonly",
+      highWaterMark: 1 << 25,
+    })
+  
+    return createAudioResource(stream, {
+      inputType: StreamType.Arbitrary,
+    })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 function createConnection(channel) {
@@ -64,10 +69,13 @@ function createConnection(channel) {
 }
 
 function getConfig(interaction) {
-  const sub = interaction.options.getSubcommand()
-  const isFromLibrary = library.find(l => l.name === sub)
+  const { name: option, value: name } = interaction.options.data[0]
 
-  if(isFromLibrary) return isFromLibrary
+  if(option === 'clip') return library.find(c => c.name === name)
+
+  const link = interaction.options.data[0].value
+
+  return { link }
 }
 
 // function parseLink(link) {
