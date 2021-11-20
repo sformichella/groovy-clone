@@ -1,22 +1,34 @@
 const client = require('./client');
 
-const useSlashCommands = require('./middleware/slashCommands');
-const musicCommands = require('./middleware/music')
+const slash = require('./listeners/slash');
+const music = require('./listeners/music')
 
 const initialState = {}
 
-const updateListenerState = listener => {
+const musicUpdater = listener => {
   return state => {
-    return message => {
-      const result = listener(message)(state)
-      client.removeAllListeners('messageCreate')
-      client.on('messageCreate', updateListenerState(listener)(result))
+    return async message => {
+      const result = await listener(message)(state)
+      client.removeListener('messageCreate', listener)
+      client.on('messageCreate', musicUpdater(listener)(result))
       return result
     }
   }
 }
 
-const wrappedMessageCommands = updateListenerState(musicCommands)(initialState)
+const slashUpdater = listener => {
+  return state => {
+    return async interaction => {
+      const result = await listener(interaction)(state)
+      client.removeListener('interationCreate', listener)
+      client.on('interationCreate', slashUpdater(listener)(result))
+      return result
+    }
+  }
+}
 
-client.on('messageCreate', wrappedMessageCommands)
-client.on('interactionCreate', useSlashCommands)
+const musicCommands = musicUpdater(music)(initialState)
+const slashCommands = slashUpdater(slash)(initialState)
+
+client.on('messageCreate', musicCommands)
+client.on('interactionCreate', slashCommands)
