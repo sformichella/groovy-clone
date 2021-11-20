@@ -1,9 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders')
 
-const library = require('../library/index.json')
-// const makePlaySubcommand = require('../utils/makeSubcommand')
+const library = require('./library/index.json')
 
-const data = new SlashCommandBuilder()
+const play = new SlashCommandBuilder()
   .setName('play')
   .setDescription('Play music')
   .addStringOption(option => {
@@ -21,6 +20,8 @@ const data = new SlashCommandBuilder()
       }, base)
   })
 
-module.exports = {
-  data
-}
+const stop = new SlashCommandBuilder()
+  .setName('stop')
+  .setDescription('Stop playback')
+
+module.exports = { play, stop }
