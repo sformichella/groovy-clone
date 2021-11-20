@@ -8,31 +8,35 @@ const { play, stop } = require('../music/commands')
 
 module.exports = slashCommands
 
-async function slashCommands(interaction) {
+function slashCommands(interaction) {
   if(!interaction.isCommand()) return identity
-console.log('INTERACTION', interaction);
-  const { commandName } = interaction
 
-  if(commandName === 'play') {
+  const { commandName: command } = interaction
+
+  if(command === 'play') {
     const channel = client
       .guilds.cache.get(gamingGoonery)
       .members.cache.get(interaction.user.id)
       .voice.channel
 
     const link = parseArgs(interaction)
-console.log('LINK', link);
+
     if(!link) return identity
 
-    return async state => {
-      const result = play({ ...state, channel, link })
-      console.log('PLAYER STATE', result.player.state);
-      const reply = `Playing `
+    return async (state) => {
+      const result = await play({ ...state, channel, link })
+      const reply = `Playing: ${result.player.title}`
       await interaction.reply(reply)
       return result
     }
   }
 
-  if(commandName === 'stop') return stop
+  if(command === 'stop') return async state => {
+    console.log('INTERACTION', interaction);
+    const reply = 'Stopping playback'
+    await interaction.reply(reply)
+    return stop(state)
+  }
 
   return identity
 }

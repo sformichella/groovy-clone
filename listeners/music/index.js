@@ -7,7 +7,7 @@ const { play, stop } = require('./commands')
 
 module.exports = musicCommands
 
-async function musicCommands(message) {
+function musicCommands(message) {
   const { content } = message
   const [bot, ...cmdLine] = content.split(' ')
 
@@ -22,7 +22,10 @@ async function musicCommands(message) {
       .members.cache.get(message.member.id)
       .voice.channel
 
-    return state => play({ ...state, link, channel })
+    return async state => {
+      const result = await play({ ...state, link, channel })
+      return result
+    }
   }
 
   if(command === 'stop') return stop

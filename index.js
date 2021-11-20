@@ -3,14 +3,22 @@ const client = require('./client');
 const slash = require('./listeners/slash');
 const music = require('./listeners/music')
 
-const initialState = {}
+const initialState = { someState: 'test-test-test' }
 
 const musicUpdater = listener => {
   return state => {
     return async message => {
       const result = await listener(message)(state)
-      client.removeListener('messageCreate', listener)
-      client.on('messageCreate', musicUpdater(listener)(result))
+
+      const [oldListener] = client.listeners('messageCreate')
+      
+      client.removeListener('messageCreate', oldListener)
+
+      const newListener = async message => {
+        return musicUpdater(listener)(result)(message).catch(console.log)
+      }
+      
+      client.on('messageCreate', newListener)
       return result
     }
   }
@@ -20,8 +28,16 @@ const slashUpdater = listener => {
   return state => {
     return async interaction => {
       const result = await listener(interaction)(state)
-      client.removeListener('interationCreate', listener)
-      client.on('interationCreate', slashUpdater(listener)(result))
+
+      const [oldListener] = client.listeners('interactionCreate')
+
+      client.removeListener('interactionCreate', oldListener)
+
+      const newListener = async interaction => {
+        return slashUpdater(listener)(result)(interaction).catch(console.log)
+      }
+
+      client.on('interactionCreate', newListener)
       return result
     }
   }

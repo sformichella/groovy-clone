@@ -10,13 +10,20 @@ const ytdl = require("ytdl-core")
 // ---------------------------------------------------
 
 // Update to support queue!
-function play({ channel, link, ...state }) {
+async function play({ channel, link, ...state }) {
   const connection = createConnection(channel)
   const resource = createResourceFromLink(link)
+
+  const title = await ytdl.getInfo(link)
+    .then(res => res.videoDetails.title)
+
   const player = createAudioPlayer()
+  player.title = title
+
+  if(!resource) return state
 
   connection.subscribe(player)
-  player.play(resource)
+  // player.play(resource)
 
   return { ...state, connection, player }
 }
@@ -24,7 +31,7 @@ function play({ channel, link, ...state }) {
 function stop({ player, connection, ...state }) {
   if(player) player.stop()
   if(connection) connection.destroy()
-  return { ...state }
+  return state
 }
 
 function createResourceFromLink(link) {
@@ -37,8 +44,9 @@ function createResourceFromLink(link) {
     return createAudioResource(stream, {
       inputType: StreamType.Arbitrary,
     })
-  } catch (error) {
-    console.error(error)
+  } catch(err) {
+    console.log(`Resource creation failed: ${err}`);
+    return
   }
 }
 
