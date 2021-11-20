@@ -29,6 +29,8 @@ const slashUpdater = listener => {
     return async interaction => {
       const result = await listener(interaction)(state)
 
+      console.log('NUMBER OF LISTENERS', client.listeners('interactionCreate'));
+
       const [oldListener] = client.listeners('interactionCreate')
 
       client.removeListener('interactionCreate', oldListener)

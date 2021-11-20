@@ -23,7 +23,7 @@ async function play({ channel, link, ...state }) {
   if(!resource) return state
 
   connection.subscribe(player)
-  // player.play(resource)
+  player.play(resource)
 
   return { ...state, connection, player }
 }

@@ -19,13 +19,13 @@ function slashCommands(interaction) {
       .members.cache.get(interaction.user.id)
       .voice.channel
 
-    const link = parseArgs(interaction)
+    const { link, reply: defaultReply } = parseArgs(interaction)
 
     if(!link) return identity
 
     return async (state) => {
       const result = await play({ ...state, channel, link })
-      const reply = `Playing: ${result.player.title}`
+      const reply = defaultReply || `Playing: ${result.player.title}`
       await interaction.reply(reply)
       return result
     }
@@ -46,7 +46,7 @@ function parseArgs(interaction) {
 
   if(option === 'clip') return library.find(c => c.name === name)
 
-  if(option === 'link') return name
+  if(option === 'link') return { link: name }
 
   return
 }
