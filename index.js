@@ -1,7 +1,22 @@
 const client = require('./client');
-const useMessageCommands = require('./middleware/messageCommands');
 
 const useSlashCommands = require('./middleware/slashCommands');
+const musicCommands = require('./middleware/music')
 
-client.on('messageCreate', useMessageCommands)
+const initialState = {}
+
+const updateListenerState = listener => {
+  return state => {
+    return message => {
+      const result = listener(message)(state)
+      client.removeAllListeners('messageCreate')
+      client.on('messageCreate', updateListenerState(listener)(result))
+      return result
+    }
+  }
+}
+
+const wrappedMessageCommands = updateListenerState(musicCommands)(initialState)
+
+client.on('messageCreate', wrappedMessageCommands)
 client.on('interactionCreate', useSlashCommands)
