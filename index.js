@@ -3,7 +3,7 @@ const client = require('./client');
 const slash = require('./listeners/slash');
 const music = require('./listeners/music')
 
-const initialState = { someState: 'test-test-test' }
+const initialState = { queue: [] }
 
 const musicUpdater = listener => {
   return state => {

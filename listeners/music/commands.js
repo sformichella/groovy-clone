@@ -9,23 +9,38 @@ const ytdl = require("ytdl-core")
 
 // ---------------------------------------------------
 
-// Update to support queue!
-async function play({ channel, link, ...state }) {
-  const connection = createConnection(channel)
+async function play1({ player, resource, ...state }) {
+  player.play(resource)
+  return { player, ...state }
+}
+
+
+async function play({ channel, link, queue, ...state }) {
   const resource = createResourceFromLink(link)
 
   const title = await ytdl.getInfo(link)
     .then(res => res.videoDetails.title)
 
-  const player = createAudioPlayer()
-  player.title = title
+  const { 
+    player = createAudioPlayer(),
+    connection = createConnection(channel)
+  } = state
+
+  let updatedQueue = []
+
+  player.on('stateChange', (old, curr) => {
+    if(curr.status === 'idle') {
+      updatedQueue = queue.slice(1)
+      player.play(updatedQueue[0].resource)
+    }
+  })
 
   if(!resource) return state
 
   connection.subscribe(player)
   player.play(resource)
 
-  return { ...state, connection, player }
+  return { ...state, connection, player, queue }
 }
 
 function stop({ player, connection, ...state }) {
