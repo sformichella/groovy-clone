@@ -9,17 +9,40 @@ const ytdl = require("ytdl-core")
 
 // ---------------------------------------------------
 
-async function play1({ player, resource, ...state }) {
-  player.play(resource)
-  return { player, ...state }
+async function play({ link, channel, queue = [], ...state }) {
+  const song = createSongFromLink(link)
+  const connection = createConnection(channel)
+  const player = createAudioPlayer()
+
+  player.play(song.resource)
+
+  const justPlayed = queue.findIndex(song => song.played === false)
+
+  const updatedQueue = [
+    ...queue.slice(0, justPlayed),
+    { ...queue[justPlayed], played: true },
+    ...queue.slice(justPlayed+1),
+    song
+  ]
+
+  const [latest] = player.listeners()
+  if(latest) player.removeListener(latest)
+
+  player.on('stateChange', (old, curr) => {
+    if(old.status === 'playing' && curr.status === 'idle') {
+      const next = updatedQueue.findIndex(song => song.played === false)
+      if(next !== undefined) player.play(updatedQueue[next])
+
+      return
+    }
+  })
+
+  return { connection, queue: updatedQueue, ...state }
 }
 
 
-async function play({ channel, link, queue, ...state }) {
-  const resource = createResourceFromLink(link)
-
-  const title = await ytdl.getInfo(link)
-    .then(res => res.videoDetails.title)
+async function makeStuff({ channel, link, queue, ...state }) {
+  const resource = createSongFromLink(link)
 
   const { 
     player = createAudioPlayer(),
@@ -30,7 +53,7 @@ async function play({ channel, link, queue, ...state }) {
 
   player.on('stateChange', (old, curr) => {
     if(curr.status === 'idle') {
-      updatedQueue = queue.slice(1)
+      
       player.play(updatedQueue[0].resource)
     }
   })
@@ -49,16 +72,23 @@ function stop({ player, connection, ...state }) {
   return state
 }
 
-function createResourceFromLink(link) {
+async function createSongFromLink(link) {
   try {
     const stream = ytdl(link, {
       filter: "audioonly",
       highWaterMark: 1 << 25,
     })
+
+    const title = await ytdl.getInfo(link)
+      .then(res => res.videoDetails.title)
   
-    return createAudioResource(stream, {
+    const resource = createAudioResource(stream, {
       inputType: StreamType.Arbitrary,
     })
+
+    resource.title = title
+
+    return { title, resource, played: false }
   } catch(err) {
     console.log(`Resource creation failed: ${err}`);
     return
@@ -74,7 +104,7 @@ function createConnection(channel) {
 }
 
 module.exports = {
-  createResourceFromLink,
+  createSongFromLink,
   createConnection,
   play,
   stop

@@ -5,6 +5,10 @@ const music = require('./listeners/music')
 
 const initialState = { queue: [] }
 
+function addListener(client, ) {
+
+}
+
 const musicUpdater = listener => {
   return state => {
     return async message => {
