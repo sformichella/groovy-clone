@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 // app.use(express.json());
 
-import { verifyKeyMiddleware } from 'discord-interactions-js'
-
 const {
   verifyKeyMiddleware: verify
 } = require('discord-interactions-js')
