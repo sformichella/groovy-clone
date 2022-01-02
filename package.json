@@ -1,6 +1,6 @@
 {
   "name": "groovy-clone",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "groovy clone",
   "main": "index.js",
   "repository": "https://github.com/sformichella/groovy-clone.git",
