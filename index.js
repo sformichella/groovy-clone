@@ -4,7 +4,7 @@ const app = express();
 
 import { verifyKeyMiddleware } from 'discord-interactions'
 
-const port = process.env.port;
+const port = process.env.PORT;
 const publicKey = process.env.discordPublicKey
 
 app.post('/api/interactions', verifyKeyMiddleware(publicKey), (req, res) => {
