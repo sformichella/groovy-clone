@@ -1,15 +1,13 @@
-const express = require('express');
+import express from 'express'
 const app = express();
 // app.use(express.json());
 
-const {
-  verifyKeyMiddleware: verify
-} = require('discord-interactions-js')
+import { verifyKeyMiddleware } from 'discord-interactions'
 
 const port = process.env.port;
 const publicKey = process.env.discordPublicKey
 
-app.post('/api/interactions', verify(publicKey), (req, res) => {
+app.post('/api/interactions', verifyKeyMiddleware(publicKey), (req, res) => {
   if(req.json.type === 1) res.send({ type: 1 })
   console.log('Interactions endpoint');
 });
