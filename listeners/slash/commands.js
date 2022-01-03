@@ -1,6 +1,12 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
+import { SlashCommandBuilder } from '@discordjs/builders'
 
-const library = require('./library/index.json')
+// import library from './library/index.json'
+const library = [{
+  "name": "rocket-lawnchair",
+  "description": "Play rocket launcher clip from Metal Slug",
+  "link": "https://www.youtube.com/watch?v=7ljtZJ9g5zo",
+  "reply": "RAWK IT LAWN CHAIR"
+}]
 
 const play = new SlashCommandBuilder()
   .setName('play')
@@ -24,4 +30,4 @@ const stop = new SlashCommandBuilder()
   .setName('stop')
   .setDescription('Stop playback')
 
-module.exports = { play, stop }
+export default { play, stop }

@@ -1,20 +1,18 @@
-const { REST } = require('@discordjs/rest')
-const { Routes } = require('discord-api-types/v9')
-const {
-	clientId,
-	gamingGoonery: guildId,
-	token
-} = require('./config.json')
+import { REST } from '@discordjs/rest'
+import { Routes } from 'discord-api-types/v9'
 
-const slashCommands = Object.values(require('./listeners/slash/commands.js'))
-	.reduce((cmds, cmd) => [...cmds, cmd.toJSON()], [])
+import cmds from './listeners/slash/commands.js'
 
-const rest = new REST({ version: '9' }).setToken(token);
+const slashCommands = Object.values(cmds)
+	.reduce((cmds, cmd) => {
+		return [...cmds, cmd.toJSON()]
+	}, [])
 
+const rest = new REST({ version: '9' })
 const deploySlashCommands = async () => {
 	console.log('Started refreshing application (/) commands.')
 	await rest.put(
-		Routes.applicationGuildCommands(clientId, guildId),
+		Routes.applicationGuildCommands('917557108508074045', '916408532180537405'),
 		{ body: slashCommands },
 	)
 	console.log('Successfully reloaded application (/) commands.')

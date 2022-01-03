@@ -1,12 +1,12 @@
-const client = require('../../client')
+import { guilds } from '../../client';
 
-const {  identity } = require('../utils');
-const { gamingGoonery } =  require('../../config.json')
-const library = require('./library/index.json')
+import { identity } from '../utils';
+import { gamingGoonery } from '../../config.json';
+import { find } from './library/index.json';
 
-const { play, stop } = require('../music/commands')
+import { play, stop } from '../music/commands';
 
-module.exports = slashCommands
+export default slashCommands
 
 function slashCommands(interaction) {
   if(!interaction.isCommand()) return identity
@@ -14,8 +14,7 @@ function slashCommands(interaction) {
   const { commandName: command } = interaction
 
   if(command === 'play') {
-    const channel = client
-      .guilds.cache.get(gamingGoonery)
+    const channel = guilds.cache.get(gamingGoonery)
       .members.cache.get(interaction.user.id)
       .voice.channel
 
@@ -44,7 +43,7 @@ function slashCommands(interaction) {
 function parseArgs(interaction) {
   const { name: option, value: name } = interaction.options.data[0]
 
-  if(option === 'clip') return library.find(c => c.name === name)
+  if(option === 'clip') return find(c => c.name === name)
 
   if(option === 'link') return { link: name }
 
