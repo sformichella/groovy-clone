@@ -1,22 +1,78 @@
-import express from 'express'
-const app = express();
-// app.use(express.json());
+import client from './client.js'
+import Session from './session.js';
 
-import { verifyKeyMiddleware } from 'discord-interactions'
+import { joinVoiceChannel } from '@discordjs/voice';
 
-const port = process.env.PORT;
-const publicKey = process.env.discordPublicKey
+const staleInterval = 10 * 60 * 1000
 
-app.get('/api/interactions', (req, res) => {
-  res.send('gaming goonery music bot')
+const state = {}
+const commandSymbol = '!'
+
+console.log('Listening...');
+
+setInterval(() => checkForStale(state), staleInterval)
+
+client.on('messageCreate', message => {
+  const {
+    content,
+    guildId,
+    author: { id: memberId }
+  } = message
+
+  // const isCommand = true
+  // if(!isCommand) return
+
+  let session = state[guildId]
+  const needsInit = session === undefined || session.stale === true
+
+  if(needsInit) {
+    const channel = client
+      .guilds.cache.get(guildId)
+      .members.cache.get(memberId)
+      .voice.channel
+
+    const connection = createConnection(channel)
+    
+    session = new Session({ connection })
+    state[guildId] = session
+  }
+
+  if(content.split(' ')[0] === 'play') {
+    const link = content.split(' ')[1]
+
+    const reply = session.play(link)
+
+    console.log(reply);
+  }
+
+  if(content.split(' ')[0] === 'next') {
+    const reply = session.next()
+
+    console.log(reply);
+  }
 })
 
-app.post('/api/interactions', verifyKeyMiddleware(publicKey), (req, res) => {
-  if(req.json.type === 1) res.send({ type: 1 })
-  console.log('Interactions endpoint');
-  console.log('INTERACTIONS REQUEST', req);
-});
 
-app.listen(port, () => {
-  console.log(`Started on ${port}.`);
-});
+
+function checkForStale(state) {
+  const staleSessions = Object.keys(state)
+    .filter(guildId => state[guildId].stale === true)
+
+  const staleString = staleSessions.reduce((string, id) => {
+    return string + '\t' + id + '\n'
+  }, '')
+
+  console.log(`Found ${staleSessions.length} stale sessions:${staleString}\nDeleting...`);
+
+  staleSessions.forEach(guildId => delete state[guildId])
+}
+
+function createConnection(channel) {
+  return joinVoiceChannel({
+    channelId: channel.id,
+    guildId: channel.guild.id,
+    adapterCreator: channel.guild.voiceAdapterCreator,
+  })
+}
+
+

@@ -9,7 +9,7 @@
   "type": "module",
   "dependencies": {
     "@discordjs/builders": "0.7.0",
-    "@discordjs/opus": "^0.6.0",
+    "@discordjs/opus": "discordjs/opus",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@discordjs/voice": "^0.7.2",
     "axios": "^0.24.0",
@@ -21,7 +21,7 @@
     "express": "^4.17.2",
     "ffmpeg-static": "^4.4.0",
     "ws": "^8.3.0",
-    "ytdl-core": "^4.9.1"
+    "ytdl-core": "4.9.1"
   },
   "scripts": {
     "deploy": "node -r dotenv/config deploy.js",

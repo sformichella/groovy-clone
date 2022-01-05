@@ -1,15 +1,18 @@
-import { createAudioPlayer } from "@discordjs/voice"
+import { createAudioPlayer, createAudioResource, StreamType } from "@discordjs/voice"
+import ytdl from 'ytdl-core'
 
 class Session {
   static timeout = 180000
 
   constructor({ player = createAudioPlayer(), connection }) {
+    this.stale = false
+
     this.queue = []
     this.playingIndex = 0
 
     this.player = player
     this.connection = connection
-    
+
     this.timeout = null
 
     connection.subscribe(player)
@@ -23,7 +26,10 @@ class Session {
       const { playingIndex, queue } = this
 
       if(!queue[playingIndex]) {
-        this.timeout = setTimeout(() => connection.destroy(), Session.timeout)
+        this.timeout = setTimeout(() => {
+          connection.destroy()
+          this.stale = true
+        }, Session.timeout)
         return
       }
 
@@ -31,7 +37,7 @@ class Session {
     })
   }
 
-  play(link) {
+  async play(link) {
     const { queue, playingIndex, player, timeout } =  this
 
     if(timeout) {
@@ -39,7 +45,9 @@ class Session {
       this.timeout = null
     }
 
-    const resource = link
+    const { resource, title } = await createSongFromLink(link)
+
+    if(!resource) return { message: 'Failed to add song to queue :(' }
 
     queue.push({ resource })
 
@@ -47,12 +55,12 @@ class Session {
     if(queue.length - 1 === playingIndex) {
       player.play(resource)
       return {
-        message: `Playing ...`
+        message: `Playing ${title}`
       }
     }
 
     return {
-      message: `Added ... to queue`
+      message: `Added ${title} to queue`
     }
   }
 
@@ -77,6 +85,33 @@ class Session {
 
 export default Session
 
-// function getId(name) {
-//   return `${name}-${Date.now()}`
-// }
+async function createSongFromLink(link) {
+  try {
+    console.log(`Fetching stream for '${link}'`);
+
+    const stream = ytdl(link, {
+      filter: "audioonly",
+      highWaterMark: 1 << 25,
+    })
+
+    console.log(`Fetched!`);
+    console.log('Trying to get title');
+
+    const title = await ytdl.getInfo(link)
+      .then(res => res.videoDetails.title)
+
+    console.log('Done!');
+    console.log(`Creating resource for '${title}'`);
+
+    const resource = createAudioResource(stream, {
+      inputType: StreamType.Arbitrary,
+    })
+
+    console.log(`Resource created`);
+
+    return { resource, title }
+  } catch(err) {
+    console.log(`Resource creation failed: ${err}`);
+    return
+  }
+}
