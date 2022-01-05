@@ -12,7 +12,9 @@ console.log('Listening...');
 
 setInterval(() => checkForStale(state), staleInterval)
 
-client.on('messageCreate', message => {
+client.on('messageCreate', messageCommandMiddleware)
+
+function messageCommandMiddleware(message) {
   const {
     content,
     guildId,
@@ -55,7 +57,7 @@ client.on('messageCreate', message => {
     const reply = session.stop()
     console.log(reply)
   }
-})
+}
 
 function parse(content) {
   return content.split(' ')
