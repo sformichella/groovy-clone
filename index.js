@@ -3,7 +3,7 @@ import Session from './session.js';
 
 import { joinVoiceChannel } from '@discordjs/voice';
 
-const staleInterval = 10 * 1000
+const staleInterval = 10 * 60 * 1000
 
 const state = {}
 const commandSymbol = '!'
@@ -19,16 +19,16 @@ client.on('messageCreate', message => {
     author: { id: memberId }
   } = message
 
-  const command = parse(content)
-
-  // const isCommand = true
-  // if(!isCommand) return
+  const isCommand = content[0] === commandSymbol
+  if(!isCommand) return
+  
+  const [command, ...args] = parse(content.slice(1))
 
   let session = state[guildId]
   const needsInit = session === undefined || session.stale === true
 
   if(needsInit) {
-    const guild =  client.guilds.cache.get(guildId).name
+    const guild = client.guilds.cache.get(guildId).name
     
     const channel = client
     .guilds.cache.get(guildId)
@@ -42,8 +42,7 @@ client.on('messageCreate', message => {
   }
 
   if(command === 'play') {
-    const link = content.split(' ')[1]
-    const reply = session.play(link)
+    const reply = session.play(args[0])
     console.log(reply);
   }
 
@@ -59,7 +58,7 @@ client.on('messageCreate', message => {
 })
 
 function parse(content) {
-  return content.split(' ')[0]
+  return content.split(' ')
 }
 
 function createConnection(channel) {

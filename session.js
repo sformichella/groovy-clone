@@ -2,7 +2,7 @@ import { createAudioPlayer, createAudioResource, StreamType } from "@discordjs/v
 import ytdl from 'ytdl-core'
 
 class Session {
-  static timeout = 10000
+  static timeout = 2 * 60 * 1000
 
   constructor({ guild, player = createAudioPlayer(), connection }) {
     this.stale = false
