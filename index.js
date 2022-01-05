@@ -37,7 +37,7 @@ client.on('messageCreate', message => {
     state[guildId] = session
   }
 
-  if(content.split(' ')[0] === 'play') {
+  if(parse(content) === 'play') {
     const link = content.split(' ')[1]
 
     const reply = session.play(link)
@@ -45,14 +45,16 @@ client.on('messageCreate', message => {
     console.log(reply);
   }
 
-  if(content.split(' ')[0] === 'next') {
+  if(parse(content) === 'next') {
     const reply = session.next()
 
     console.log(reply);
   }
 })
 
-
+function parse(content) {
+  return content.split(' ')[0]
+}
 
 function checkForStale(state) {
   const staleSessions = Object.keys(state)
