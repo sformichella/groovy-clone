@@ -12,7 +12,18 @@ console.log('Listening...');
 
 setInterval(() => checkForStale(state), staleInterval)
 
-client.on('messageCreate', messageCommandMiddleware)
+const middlewares = {
+  messageCommandMiddleware,
+  errorMiddleware,
+}
+
+client.on('messageCreate', makeListener(middlewares))
+
+function errorMiddleware(message, error) {
+  console.log('Something is broken!', error.message);
+  console.log('---- Full error log ----');
+  console.log(error);
+}
 
 function messageCommandMiddleware(message) {
   const {
@@ -91,4 +102,17 @@ function checkForStale(state) {
   }, '')
 
   console.log(`Current sessions:\n${sessions}`);
+}
+
+function makeListener(middlewares) {
+  return function (message) {
+    const { errorMiddleware, ...rest } = middlewares
+    try {
+      return Object
+        .values(rest)
+        .reduce((res, middleware) => middleware(message, res), {})
+    } catch(error) {
+      return errorMiddleware(message, error)
+    }
+  }
 }
