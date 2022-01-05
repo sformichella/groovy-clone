@@ -2,9 +2,9 @@ import { createAudioPlayer, createAudioResource, StreamType } from "@discordjs/v
 import ytdl from 'ytdl-core'
 
 class Session {
-  static timeout = 180000
+  static timeout = 10000
 
-  constructor({ player = createAudioPlayer(), connection }) {
+  constructor({ guild, player = createAudioPlayer(), connection }) {
     this.stale = false
 
     this.queue = []
@@ -14,6 +14,8 @@ class Session {
     this.connection = connection
 
     this.timeout = null
+
+    this.guild = guild
 
     connection.subscribe(player)
 
@@ -27,6 +29,7 @@ class Session {
 
       if(!queue[playingIndex]) {
         this.timeout = setTimeout(() => {
+          console.log(`Guild '${this.guild}' session exceeded timeout. Disconnecting...`);
           connection.destroy()
           this.stale = true
         }, Session.timeout)

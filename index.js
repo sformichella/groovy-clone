@@ -3,7 +3,7 @@ import Session from './session.js';
 
 import { joinVoiceChannel } from '@discordjs/voice';
 
-const staleInterval = 10 * 60 * 1000
+const staleInterval = 10 * 1000
 
 const state = {}
 const commandSymbol = '!'
@@ -28,47 +28,38 @@ client.on('messageCreate', message => {
   const needsInit = session === undefined || session.stale === true
 
   if(needsInit) {
+    const guild =  client.guilds.cache.get(guildId).name
+    
     const channel = client
-      .guilds.cache.get(guildId)
-      .members.cache.get(memberId)
-      .voice.channel
+    .guilds.cache.get(guildId)
+    .members.cache.get(memberId)
+    .voice.channel
 
     const connection = createConnection(channel)
     
-    session = new Session({ connection })
+    session = new Session({ guild, connection })
     state[guildId] = session
   }
 
   if(command === 'play') {
     const link = content.split(' ')[1]
-
     const reply = session.play(link)
-
     console.log(reply);
   }
 
   if(command === 'next') {
     const reply = session.next()
-
     console.log(reply);
+  }
+
+  if(command === 'stop') {
+    const reply = session.stop()
+    console.log(reply)
   }
 })
 
 function parse(content) {
   return content.split(' ')[0]
-}
-
-function checkForStale(state) {
-  const staleSessions = Object.keys(state)
-    .filter(guildId => state[guildId].stale === true)
-
-  const staleString = staleSessions.reduce((string, id) => {
-    return string + '\t' + id + '\n'
-  }, '')
-
-  console.log(`Found ${staleSessions.length} stale sessions:${staleString}\nDeleting...`);
-
-  staleSessions.forEach(guildId => delete state[guildId])
 }
 
 function createConnection(channel) {
@@ -79,4 +70,24 @@ function createConnection(channel) {
   })
 }
 
+function checkForStale(state) {
+  const staleSessions = Object.entries(state)
+    .reduce((out, [id, session]) => {
+      if(session.stale) return { ...out, [id]: session }
+      return out
+    }, {})
 
+  const staleString = Object.entries(staleSessions).reduce((string, [id, session]) => {
+    return string + '\t' + `${session.guild} (${id})` + '\n'
+  }, '')
+
+  console.log(`Found ${Object.keys(staleSessions).length} stale sessions:${staleString}\nDeleting...`);
+
+  Object.keys(staleSessions).forEach(guildId => delete state[guildId])
+
+  const sessions = Object.entries(state).reduce((string, [id, session]) => {
+    return string + '\t' + `${session.guild} (${id})` + '\n'
+  }, '')
+
+  console.log(`Current sessions:\n${sessions}`);
+}
