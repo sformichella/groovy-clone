@@ -19,6 +19,8 @@ client.on('messageCreate', message => {
     author: { id: memberId }
   } = message
 
+  const command = parse(content)
+
   // const isCommand = true
   // if(!isCommand) return
 
@@ -37,7 +39,7 @@ client.on('messageCreate', message => {
     state[guildId] = session
   }
 
-  if(parse(content) === 'play') {
+  if(command === 'play') {
     const link = content.split(' ')[1]
 
     const reply = session.play(link)
@@ -45,7 +47,7 @@ client.on('messageCreate', message => {
     console.log(reply);
   }
 
-  if(parse(content) === 'next') {
+  if(command === 'next') {
     const reply = session.next()
 
     console.log(reply);
