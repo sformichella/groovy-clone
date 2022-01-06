@@ -48,20 +48,17 @@ function messageCommandMiddleware(message) {
       state[guildId] = session
     }
 
-    const reply = session.play(args[0])
-    console.log(reply);
+    return session.play(args[0])
   }
 
   if(command === 'next') {
     if(stale) return
-    const reply = session.next()
-    console.log(reply);
+    return session.next()
   }
 
   if(command === 'stop') {
     if(stale) return
-    const reply = session.stop()
-    console.log(reply)
+    return session.stop()
   }
 }
 

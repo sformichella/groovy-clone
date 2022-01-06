@@ -56,6 +56,7 @@ class Session {
 
     // Handle the case where the player is idle
     if(queue.length - 1 === playingIndex) {
+      console.log('Playing');
       player.play(resource)
       return {
         message: `Playing ${title}`
