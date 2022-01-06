@@ -18,7 +18,7 @@ client.on('messageCreate', makeListener(middlewares))
 
 console.log('Listening...');
 
-function messageCommandMiddleware(message) {
+async function messageCommandMiddleware(message) {
   const {
     content,
     guildId,
@@ -53,12 +53,14 @@ function messageCommandMiddleware(message) {
 
   if(command === 'next') {
     if(stale) return
-    return session.next()
+    const reply = session.next()
+    return reply
   }
 
   if(command === 'stop') {
     if(stale) return
-    return session.stop()
+    const reply = session.stop()
+    return reply
   }
 }
 
@@ -84,13 +86,10 @@ function createConnection(channel) {
 
 function makeListener(middlewares) {
   return function (message) {
+    console.log('Making listener!');
     const { errorMiddleware, ...rest } = middlewares
-    try {
-      return Object
-        .values(rest)
-        .reduce((res, middleware) => middleware(message, res), {})
-    } catch(error) {
-      return errorMiddleware(message, error)
-    }
+    return Object.values(rest)
+      .reduce((res, middleware) => res.then(() => middleware(message, res)), Promise.resolve())
+      .catch(e => errorMiddleware(message, e))
   }
 }

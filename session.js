@@ -90,32 +90,30 @@ class Session {
 export default Session
 
 async function createSongFromLink(link) {
-  try {
-    console.log(`Fetching stream for '${link}'`);
+  console.log(`Fetching stream for '${link}'`);
 
-    const stream = ytdl(link, {
-      filter: "audioonly",
-      highWaterMark: 1 << 25,
-    })
+  const stream = ytdl(link, {
+    filter: "audioonly",
+    highWaterMark: 1 << 25,
+  })
 
-    console.log(`Fetched!`);
-    console.log('Trying to get title');
+  return ytdl.getInfo(link)
+    .then(res => res.videoDetails.title)
+    .then(title => ({
+      title,
+      resource: createAudioResource(stream, {
+        inputType: StreamType.Arbitrary,
+      })
+    }))
 
-    const title = await ytdl.getInfo(link)
-      .then(res => res.videoDetails.title)
+  // console.log('Done!');
+  // console.log(`Creating resource for '${title}'`);
 
-    console.log('Done!');
-    console.log(`Creating resource for '${title}'`);
+  // const resource = createAudioResource(stream, {
+  //   inputType: StreamType.Arbitrary,
+  // })
 
-    const resource = createAudioResource(stream, {
-      inputType: StreamType.Arbitrary,
-    })
+  // console.log(`Resource created`);
 
-    console.log(`Resource created`);
-
-    return { resource, title }
-  } catch(err) {
-    console.log(`Resource creation failed: ${err}`);
-    return
-  }
+  // return { resource, title }
 }
