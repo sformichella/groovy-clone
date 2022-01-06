@@ -1,7 +1,7 @@
+import { joinVoiceChannel } from '@discordjs/voice';
+
 import client from './client.js'
 import Session from './session.js';
-
-import { joinVoiceChannel } from '@discordjs/voice';
 
 const staleInterval = 10 * 60 * 1000
 
@@ -19,12 +19,6 @@ const middlewares = {
 
 client.on('messageCreate', makeListener(middlewares))
 
-function errorMiddleware(message, error) {
-  console.log('Something is broken!', error.message);
-  console.log('---- Full error log ----');
-  console.log(error);
-}
-
 function messageCommandMiddleware(message) {
   const {
     content,
@@ -38,36 +32,44 @@ function messageCommandMiddleware(message) {
   const [command, ...args] = parse(content.slice(1))
 
   let session = state[guildId]
-  const needsInit = session === undefined || session.stale === true
-
-  if(needsInit) {
-    const guild = client.guilds.cache.get(guildId).name
-    
-    const channel = client
-    .guilds.cache.get(guildId)
-    .members.cache.get(memberId)
-    .voice.channel
-
-    const connection = createConnection(channel)
-    
-    session = new Session({ guild, connection })
-    state[guildId] = session
-  }
+  const stale = session === undefined || session.stale === true
 
   if(command === 'play') {
+    if(stale) {
+      const guild = client.guilds.cache.get(guildId).name
+      
+      const channel = client
+        .guilds.cache.get(guildId)
+        .members.cache.get(memberId)
+        .voice.channel
+
+      const connection = createConnection(channel)
+      
+      session = new Session({ guild, connection })
+      state[guildId] = session
+    }
+
     const reply = session.play(args[0])
     console.log(reply);
   }
 
   if(command === 'next') {
+    if(stale) return
     const reply = session.next()
     console.log(reply);
   }
 
   if(command === 'stop') {
+    if(stale) return
     const reply = session.stop()
     console.log(reply)
   }
+}
+
+function errorMiddleware(message, error) {
+  console.log('Something is broken!', error.message);
+  console.log('---- Full error log ----');
+  console.log(error);
 }
 
 function parse(content) {

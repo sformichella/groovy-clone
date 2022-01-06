@@ -12,8 +12,6 @@ const client = new Client({
 
 console.log('Logging in client.');
 
-client.login(token)
-
-console.log('Done!');
+client.login(token).then(() => console.log('Done!'))
 
 export default client
