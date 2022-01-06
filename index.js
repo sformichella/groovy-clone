@@ -1,7 +1,7 @@
 import { joinVoiceChannel } from '@discordjs/voice';
 
 import client from './client.js'
-import hearbeat from './heartbeat.js';
+import heartbeat from './heartbeat.js';
 import Session from './session.js';
 
 export const state = {}
@@ -12,7 +12,7 @@ const middlewares = {
   errorMiddleware,
 }
 
-hearbeat()
+heartbeat()
 
 client.on('messageCreate', makeListener(middlewares))
 

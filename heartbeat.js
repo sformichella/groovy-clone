@@ -2,7 +2,7 @@ import { state } from './index.js'
 
 const pulse = 10 * 60 * 1000
 
-function hearbeat() {
+function heartbeat() {
   return setInterval(() => checkForStale(state), pulse)
 }
 
@@ -28,4 +28,4 @@ function checkForStale(state) {
   console.log(`Current sessions:\n${sessions}`);
 }
 
-export default hearbeat
+export default heartbeat
