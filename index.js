@@ -1,23 +1,22 @@
 import { joinVoiceChannel } from '@discordjs/voice';
 
 import client from './client.js'
+import hearbeat from './heartbeat.js';
 import Session from './session.js';
 
-const staleInterval = 10 * 60 * 1000
-
-const state = {}
+export const state = {}
 const commandSymbol = '!'
-
-console.log('Listening...');
-
-setInterval(() => checkForStale(state), staleInterval)
 
 const middlewares = {
   messageCommandMiddleware,
   errorMiddleware,
 }
 
+hearbeat()
+
 client.on('messageCreate', makeListener(middlewares))
+
+console.log('Listening...');
 
 function messageCommandMiddleware(message) {
   const {
@@ -84,27 +83,7 @@ function createConnection(channel) {
   })
 }
 
-function checkForStale(state) {
-  const staleSessions = Object.entries(state)
-    .reduce((out, [id, session]) => {
-      if(session.stale) return { ...out, [id]: session }
-      return out
-    }, {})
 
-  const staleString = Object.entries(staleSessions).reduce((string, [id, session]) => {
-    return string + '\t' + `${session.guild} (${id})` + '\n'
-  }, '')
-
-  console.log(`Found ${Object.keys(staleSessions).length} stale sessions:${staleString}\nDeleting...`);
-
-  Object.keys(staleSessions).forEach(guildId => delete state[guildId])
-
-  const sessions = Object.entries(state).reduce((string, [id, session]) => {
-    return string + '\t' + `${session.guild} (${id})` + '\n'
-  }, '')
-
-  console.log(`Current sessions:\n${sessions}`);
-}
 
 function makeListener(middlewares) {
   return function (message) {
