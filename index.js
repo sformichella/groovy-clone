@@ -13,7 +13,8 @@ const middleware = {
 
 heartbeat()
 
-client.on('messageCreate', promiseWrapper(middleware))
+// client.on('messageCreate', promiseWrapper(middleware))
+client.on('messageCreate', console.log)
 
 console.log('Listening...');
 

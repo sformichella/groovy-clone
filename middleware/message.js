@@ -30,7 +30,7 @@ function init(client, state) {
           .members.cache.get(memberId)
           .voice.channel
 
-        const connection = createConnection(channel)
+        const connection = connect(channel)
         
         session = new Session({ guild, connection })
         state[guildId] = session
@@ -58,7 +58,7 @@ function parse(content) {
   return content.split(' ')
 }
 
-function createConnection(channel) {
+function connect(channel) {
   return joinVoiceChannel({
     channelId: channel.id,
     guildId: channel.guild.id,
