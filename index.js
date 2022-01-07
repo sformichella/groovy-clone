@@ -1,7 +1,3 @@
-import { config } from 'dotenv';
-
-config()
-
 import client from './client.js'
 import heartbeat from './heartbeat.js';
 

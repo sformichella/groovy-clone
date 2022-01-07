@@ -1,3 +1,5 @@
+import { config } from 'dotenv'; config()
+
 import { Client, Intents } from 'discord.js'
 
 const token = process.env.discordBotToken
