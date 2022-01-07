@@ -1,7 +1,7 @@
 import { joinVoiceChannel } from '@discordjs/voice';
 
 const commandSymbol = '!'
-import Session from './session.js';
+import Session from '../session.js';
 
 export default init
 
