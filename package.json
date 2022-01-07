@@ -7,6 +7,9 @@
   "author": "sformichella <sformichella@gmail.com>",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": "16.x"
+  },
   "dependencies": {
     "@discordjs/builders": "0.7.0",
     "@discordjs/opus": "discordjs/opus",

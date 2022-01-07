@@ -1,21 +1,18 @@
-import init from './client.js'
+import client from './client.js'
 import heartbeat from './heartbeat.js';
 
 import error from './middleware/error.js'
 import message from './middleware/message.js'
 
 export const state = {}
-
 const middleware = {
   message: message(client, state),
   error
 }
 
 heartbeat()
-const client = init()
 
-// client.on('messageCreate', promiseWrapper(middleware))
-client.on('messageCreate', console.log)
+client.on('messageCreate', promiseWrapper(middleware))
 
 console.log('Listening...');
 
