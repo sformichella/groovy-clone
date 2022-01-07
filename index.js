@@ -1,4 +1,4 @@
-import client from './client.js'
+import init from './client.js'
 import heartbeat from './heartbeat.js';
 
 import error from './middleware/error'
@@ -12,6 +12,7 @@ const middleware = {
 }
 
 heartbeat()
+const client = init()
 
 // client.on('messageCreate', promiseWrapper(middleware))
 client.on('messageCreate', console.log)

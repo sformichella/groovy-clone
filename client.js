@@ -10,8 +10,9 @@ const client = new Client({
   ]
 })
 
-console.log('Logging in client.');
-
-client.login(token).then(() => console.log('Done!'))
-
-export default client
+export default async function() {
+  console.log('Logging in client.');
+  await client.login(token)
+  console.log('Done!');
+  return client
+}
