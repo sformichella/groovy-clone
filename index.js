@@ -1,8 +1,8 @@
 import init from './client.js'
 import heartbeat from './heartbeat.js';
 
-import error from './middleware/error'
-import message from './middleware/message'
+import error from './middleware/error.js'
+import message from './middleware/message.js'
 
 export const state = {}
 
