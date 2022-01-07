@@ -16,10 +16,10 @@ client.on('messageCreate', promiseWrapper(middleware))
 
 console.log('Listening...');
 
-function promiseWrapper({ errorMiddleware, ...rest }) {
+function promiseWrapper({ error, ...rest }) {
   return function (message) {
     return Object.values(rest)
       .reduce((res, middleware) => res.then(() => middleware(message, res)), Promise.resolve({}))
-      .catch(e => errorMiddleware(message, e))
+      .catch(e => error(message, e))
   }
 }
