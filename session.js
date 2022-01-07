@@ -20,14 +20,13 @@ class Session {
     connection.subscribe(player)
 
     player.on('stateChange', (old, current) => {
+      console.log('Player status', current.status);
       if(old.status !== 'playing') return
       if(current.status !== 'idle') return
 
-      this.playingIndex += 1
-
       const { playingIndex, queue } = this
 
-      if(!queue[playingIndex]) {
+      if(!queue[playingIndex + 1]) {
         this.timeout = setTimeout(() => {
           console.log(`Guild '${this.guild}' session exceeded timeout. Disconnecting...`);
           connection.destroy()
@@ -36,7 +35,8 @@ class Session {
         return
       }
 
-      player.play(queue[playingIndex].resource)
+      this.playingIndex += 1
+      player.play(queue[this.playingIndex].resource)
     })
   }
 
@@ -89,7 +89,7 @@ class Session {
 
 export default Session
 
-async function createSongFromLink(link) {
+function createSongFromLink(link) {
   console.log(`Fetching stream for '${link}'`);
 
   const stream = ytdl(link, {
@@ -105,15 +105,4 @@ async function createSongFromLink(link) {
         inputType: StreamType.Arbitrary,
       })
     }))
-
-  // console.log('Done!');
-  // console.log(`Creating resource for '${title}'`);
-
-  // const resource = createAudioResource(stream, {
-  //   inputType: StreamType.Arbitrary,
-  // })
-
-  // console.log(`Resource created`);
-
-  // return { resource, title }
 }

@@ -7,6 +7,7 @@ import message from './middleware/message.js'
 export const state = {}
 const middleware = {
   message: message(client, state),
+  logger: (message, res) => console.log(res),
   error
 }
 
