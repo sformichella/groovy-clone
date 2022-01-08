@@ -41,6 +41,8 @@ class Session {
   }
 
   async play(link) {
+    if(!link) return
+
     const { queue, playingIndex, player, timeout } =  this
 
     if(timeout) {
