@@ -4,10 +4,6 @@ import heartbeat from './heartbeat.js';
 import error from './middleware/error.js'
 import message from './middleware/message.js'
 
-import { generateDependencyReport } from "@discordjs/voice";
-
-console.log(generateDependencyReport());
-
 export const state = {}
 const middleware = {
   message: message(client, state),

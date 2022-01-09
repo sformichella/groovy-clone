@@ -20,7 +20,6 @@ class Session {
     connection.subscribe(player)
 
     player.on('stateChange', (old, current) => {
-      console.log('Player status', current.status);
       if(old.status !== 'playing') return
       if(current.status !== 'idle') return
 
