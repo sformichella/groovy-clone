@@ -1,5 +1,8 @@
-const { Client, Intents } = require('discord.js')
-const { token } = require('./config.json')
+import { config } from 'dotenv'; config()
+
+import { Client, Intents } from 'discord.js'
+
+const token = process.env.discordBotToken
 
 const client = new Client({
   intents: [
@@ -9,6 +12,8 @@ const client = new Client({
   ]
 })
 
-client.login(token)
+console.log('Logging in client.');
 
-module.exports = client
+client.login(token).then(() => console.log('Done!'))
+
+export default client

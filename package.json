@@ -1,28 +1,32 @@
 {
   "name": "groovy-clone",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "groovy clone",
   "main": "index.js",
   "repository": "https://github.com/sformichella/groovy-clone.git",
   "author": "sformichella <sformichella@gmail.com>",
   "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": "16.x"
+  },
   "dependencies": {
-    "@discordjs/builders": "^0.8.2",
-    "@discordjs/opus": "^0.6.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "@discordjs/voice": "^0.7.2",
-    "discord-api-types": "^0.24.0",
-    "discord-player": "^5.1.0",
-    "discord.js": "^13.3.1",
-    "ffmpeg-static": "^4.4.0",
-    "ytdl-core": "^4.9.1"
+    "@discordjs/builders": "0.7.0",
+    "@discordjs/opus": "0.7.0",
+    "@discordjs/rest": "0.1.0-canary.0",
+    "@discordjs/voice": "0.7.5",
+    "discord-api-types": "0.24.0",
+    "discord-player": "5.1.0",
+    "discord.js": "13.3.1",
+    "dotenv": "10.0.0",
+    "ffmpeg-static": "4.4.0",
+    "libsodium-wrappers": "0.7.9",
+    "ytdl-core": "4.9.2"
   },
   "scripts": {
-    "deploy": "node deploy.js",
-    "start": "node index.js",
-    "force-logout": "node logout.js"
+    "start": "node index.js"
   },
   "devDependencies": {
-    "eslint": "^8.2.0"
+    "eslint": "^8.3.0"
   }
 }
