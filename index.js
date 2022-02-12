@@ -3,9 +3,12 @@ import heartbeat from './heartbeat.js';
 
 import error from './middleware/error.js'
 import message from './middleware/message.js'
+import initGuild from './middleware/initGuild.js'
 
 export const state = {}
-const middleware = {
+
+const messageMiddleware = {
+  initGuild: initGuild(client, state),
   message: message(client, state),
   logger: (message, res) => console.log(res),
   error
@@ -13,7 +16,7 @@ const middleware = {
 
 heartbeat()
 
-client.on('messageCreate', promiseWrapper(middleware))
+client.on('messageCreate', promiseWrapper(messageMiddleware))
 
 console.log('Listening...');
 
@@ -23,4 +26,4 @@ function promiseWrapper({ error, ...rest }) {
       .reduce((res, middleware) => res.then(() => middleware(message, res)), Promise.resolve({}))
       .catch(e => error(message, e))
   }
-}
+} 

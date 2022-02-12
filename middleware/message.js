@@ -1,11 +1,10 @@
-import { joinVoiceChannel } from '@discordjs/voice';
+import { play, next, stop, config } from '../commands/index.js'
 
-const commandSymbol = '!'
-import Session from '../session.js';
+const defaultCommand = () => {
+  return ''
+}
 
-export default init
-
-function init(client, state) {
+export default function init(client, state) {
   return function (message) {
     const {
       content,
@@ -13,55 +12,53 @@ function init(client, state) {
       author: { id: memberId }
     } = message
 
-    const isCommand = content[0] === commandSymbol
-    if(!isCommand) return
-    
-    const [command, ...args] = parse(content.slice(1))
+    const { commandSymbol } = state[guildId]
 
-    let session = state[guildId]
-    const stale = session === undefined || session.stale === true
+    const parsed = parse(content, commandSymbol)
+    if(parsed === null) return
+
+    const [command, ...args] = parsed
 
     if(command === 'play') {
-      if(stale) {
-        const guild = client.guilds.cache.get(guildId).name
-        
-        const channel = client
-          .guilds.cache.get(guildId)
-          .members.cache.get(memberId)
-          .voice.channel
-
-        const connection = connect(channel)
-        
-        session = new Session({ guild, connection })
-        state[guildId] = session
-      }
-
-      return session.play(args[0])
+      return play(client, {
+        state,
+        guildId,
+        memberId,
+        args
+      })
     }
 
     if(command === 'next') {
-      if(stale) return
-      const reply = session.next()
-      return reply
+      return next(client, {
+        state,
+        guildId
+      })
     }
 
     if(command === 'stop') {
-      if(stale) return
-      const reply = session.stop()
-      return reply
+      return stop(client, {
+        state,
+        guildId
+      })
     }
+
+    if(command === 'config') {
+      return config(client, {
+        state,
+        guildId,
+        args
+      })
+    }
+
+    return defaultCommand(client, state)
   }
 }
 
+function parse(content, commandSymbol) {
+  const characters = commandSymbol.length
+  const isCommand = content.slice(0, characters) === commandSymbol
 
-function parse(content) {
-  return content.split(' ')
-}
-
-function connect(channel) {
-  return joinVoiceChannel({
-    channelId: channel.id,
-    guildId: channel.guild.id,
-    adapterCreator: channel.guild.voiceAdapterCreator,
-  })
-}
+  if(!isCommand) return null
+  
+  return content.slice(characters).split(' ')
+} 
